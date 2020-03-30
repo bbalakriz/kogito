@@ -128,7 +128,7 @@ After starting the process instances, the status/progress of the process instanc
 
 ![Kogito Management Console](config/1.png?raw=true "Title")
 
-In the process management console, select the `Drink Order Process` instance and you can see that the process instance would be waiting at the `place-order` step. Since the persistence has been enabled, even if the `coffee-shop` kogito application goes down, the process instance would remain intact in its current state. You may try to terminate the `coffee-shop` application (_by pressing ctrl+c in the terminal in which it was started_) and you would see that process instance would still remaining in its current state in the Kogito management console. (_if you terminate the application, remember to start it back with the command `cd apps/coffee-shop && mvn compile quarkus:dev`)
+In the process management console, select the `Drink Order Process` instance and you can see that the process instance would be waiting at the `place-order` step. Since the persistence has been enabled, even if the `coffee-shop` kogito application goes down, the process instance would remain intact in its current state. You may try to terminate the `coffee-shop` application (_by pressing ctrl+c in the terminal in which it was started_) and you would see that process instance would still remaining in its current state in the Kogito management console. (_if you terminate the application, remember to start it back with the command `cd apps/coffee-shop && mvn compile quarkus:dev`_)
 
 Complete the place order by using the step specific REST APIs. First, get the task instance id for the process instance {puid} and by invoking the API
 
