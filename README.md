@@ -42,10 +42,9 @@ Alternatively, the following commands could be run on a terminal: `code <<projec
 
 ## Start the required containers
 
-All the relevant containers that are required to run the applications `coffee-shop` and `barista` are contained in `config/all-in-one-docker-compose.yaml` and these containers could be started by using docker-compose.
+All the relevant containers that are required to run these applications `coffee-shop` and `barista` are contained in `config/all-in-one-docker-compose.yaml` and these containers could be started by using docker-compose.
 
-`cd config
- docker-compose -f all-in-one-docker-compose.yaml up -d`
+`$ cd config && docker-compose -f all-in-one-docker-compose.yaml up -d`
 
 This will start up 6 containers namely - Kafka, ZooKeeper, Infinispan, Keycloak, Kogito Data Index Engine and Kogito Management Console. 
 
