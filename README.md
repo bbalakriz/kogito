@@ -1,6 +1,6 @@
 # kogito
 
-This repository showcases some of the key capabilities of Kogito like how Kogito:
+This repository showcases some of the key capabilities of Kogito specifically on how Kogito:
 
 1. Provides runtime persistence for workflows to preserve the state of the process instances across restarts. 
 2. Supports first class citizen support for events and enables integration with third party systems with both events and external REST API calls. 
@@ -19,7 +19,7 @@ Open the drink-order-process.bpmn2 using either the online BPMN editor - https:/
 1. First, install the Kogito Extension in VSCode.
 2. Download the latest Visual Studio plugin from the project page: https://github.com/kiegroup/kogito-tooling/releases
 3. Select the latest version
-4. From asset section download the file vscode_extension_kogito_kie_editors_0.2.7.vsix (the version might change)
+4. From asset section download the file vscode_extension_kogito_kie_editors_n.n.n.vsix
 5. Open Visual Studio Code
 6. Select the Extensions pane on the left
 7. Click the... icon on the top right
