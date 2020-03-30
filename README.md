@@ -18,7 +18,7 @@ To start with ensure that the following are installed in your machine before you
 
 Clone this repo:
 
-git clone https://github.com/bbalakriz/kogito
+git clone  [https://github.com/bbalakriz/kogito](https://github.com/bbalakriz/kogito)
 
 Move to the apps folder.
 
