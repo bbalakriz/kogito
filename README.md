@@ -52,9 +52,15 @@ This will start up 6 containers namely - Kafka, ZooKeeper, Infinispan, Keycloak,
 
 The drink-order-process (_located at `coffee-shop/src/main/resource/org/bala/drink/process`_) depicts the typical drink ordering steps at a coffee shop where a customer would walk in, place an order at the counter desk and then make payment at the payment desk either by cash or by a credit card. If the payment type is credit card, the payment processing would be handled by an external payment gateway. Once the payment processing goes through successfully, the barista would be notified to get started with the preparation of the required coffee. 
 
+![Drink Order Process](config/2.png?raw=true "Title")
+
+
 ## Barista project - A quick overview
 
 The barista process has been designed to run as a seperate Kogito application and would be reacting to the coffee drink order taking process. Again, it is a very simple one that shows that the barista would prepare the coffee and the customer would collect it once it is ready.
+
+![Barista Process](config/3.png?raw=true "Title")
+
 
 ## Process persistence
 
