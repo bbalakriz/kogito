@@ -38,11 +38,11 @@ To start with, ensure that the following are installed in your machine.
  4. Click "Add" 
  5. Repeat the same steps for the `barista` project as well. 
  
-Alternatively, you could run the following command on your terminal: `code <<project-name>>` where project names are `apps/coffee-shop` and `apps/barista` for both these projects
+Alternatively, the following commands could be run on a terminal: `code <<project-name>>` where project names are `apps/coffee-shop` and `apps/barista` to open both these projects in VSCode.
 
 ## Start the required containers
 
-All the relevant containers that are required to run `apps/coffee-shop` and `apps/barista` are contained in `config/all-in-one-docker-compose.yaml`. So, these containers can be easily started by using docker-compose.
+All the relevant containers that are required to run the applications `coffee-shop` and `barista` are contained in `config/all-in-one-docker-compose.yaml` and these containers could be started by using docker-compose.
 
 `cd config
  docker-compose -f all-in-one-docker-compose.yaml up -d`
@@ -59,7 +59,7 @@ The barista process has been designed to run as a seperate Kogito application an
 
 ## Process persistence
 
-Kogito provides process persistence through Infinispan, which is an in memory data grid. Process persistence can be enabled in Kogito by simply adding the extensions `quarkus-infinispan-client` and `infinispan-persistence-addon` to the Kogito project. The exact dependency details that are to be added in the pom.xml for these extensions are:
+Kogito provides process persistence through Infinispan, which is an in memory data grid. Process persistence can be enabled in Kogito by simply adding the extensions `quarkus-infinispan-client` and `infinispan-persistence-addon` to the Kogito project. The dependencies that are required for adding  these extensions to a Kogito application are:
 
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -70,7 +70,7 @@ Kogito provides process persistence through Infinispan, which is an in memory da
       <artifactId>infinispan-persistence-addon</artifactId>
     </dependency>
     
-The connection configuration using which the Kogito application can connect to Infinispan, needs to be specified in the application.properties. 
+The connection configurations using which the Kogito application needs to connect to the Infinispan datagrid, could to be specified in the application.properties as follows. 
 
     quarkus.infinispan-client.server-list=localhost:11222
     quarkus.infinispan-client.auth-server-name=infinispan
@@ -81,14 +81,42 @@ The connection configuration using which the Kogito application can connect to I
 
 ### Data Containers for processes
 
-Open the Infinispan management console in the browser by navigating to `https://localhost:11222` with the credentials `infinispan\infinispan`
+The Infinispan management console can be accessed at `https://localhost:11222` with the credentials `infinispan\infinispan`
 
+The infinispan console would display the list of all available data stores. Only three data containers will be listed in the console - jobs, processinstances and usertaskinstances that were created by kogito data index service and jobs service. There will not be any other process specific persistent stores available in the data grid at this moment. 
 
-Let's now run this Kogito app and see the persistence in action. This is the infinispan console that would display the list of all data stores. It's empty now but the application specific backing store will get created once the application in started. So, let me start the application. The application is up and running and we can see that the drink order persistent data store has got created on the fly. 
+### Running the applications
 
-Once the application is started, the process specific rest APIs are automatically generated and we'll be using the swagger UI to invoke these APIs and interact with the application. The open API & swagger capabilities gets automatically enabled in the application by adding the quarkus open API extension. 
+In order to see process persistence in action, execute the commands listed below in two different terminals to start the applications `coffee-shop` and `barista` 
 
-Let's start the drink order process from the Swagger UI. The process instance has been started and we can track the process instance from the process management console. As we can see here, the proces instance is waiting at the place order step. Since the persistence is enabled, even if the kogito application is taken down, the process instance would remain intact in its current state. So, let me terminate the application and we can see that process instance is still remaining in its current state. Now, let me bring back the application.
+**Terminal 1:**
+`$cd apps/coffee-shop && mvn clean compile quarkus:dev`
+
+**Terminal 2:** 
+`$cd apps/barista && mvn clean compile quarkus:dev`
+
+Now go back to the Infinispan management console and you'll see that the the application specific backing stores would have got created on the fly. 
+
+## Open API and Swagger UI
+
+Now that the applications have been started, the process specific REST APIs would have got generated automatically and the Swagger UI could be used to invoke these APIs and interact with the applications. In order to add the open API & swagger capabilities to a Kogito application, the following dependency has been added to the pom.xml of the application.
+
+    <dependency>
+	    <groupId>io.quarkus</groupId>
+	    <artifactId>quarkus-smallrye-openapi</artifactId>
+	  </dependency>
+
+The Swagger UI for the coffee-shop application can be accessed at `http:localhost:8080/swagger-ui` and  the drink order process can be started from the Swagger UI by invoking the end point `POST
+/drink_order_process`. Alternatively, the process instance could be started from the terminal using the command
+
+`# start process instance
+curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"`
+
+_**Note**: Note down the process instance id that's available as a part of the response to this API call_
+
+After starting the process instances, the status/progress of the process instance could be tracked from the process management console that is available at `http://localhost:8380/`. 
+
+Once started, the proces instance would be waiting at the `place-order` step. Since the persistence has been enabled, even if the kogito application goes down, the process instance would remain intact in its current state. You may try to terminate the `coffee-shop` application (_by pressing ctrl+c in the terminal in which it was started_) and you would see that process instance would still remaining in its current state in the Kogito management console. (_if you terminate the application, remember to start it back with the command `cd apps/coffee-shop && mvn compile quarkus:dev`)
 
 Let's complete the place order and make payment steps by using the step specific REST APIs. The place order step is complete now and before we complete the make payment step, let's take a look at the how the payment processing happens. Once the payment details are specified in the make payment step, and if the payment method is specified as credit card, the payment processing automated step would get triggered which in turn is configured to invoke a payment gateway API. Let's have a quick look at the process payment step and we can see that the service that's linked to this step is Payments Service and payment processing service operation will be invoked in the payments service. Loooking at the implementation of the payment service, we don't see much of business logic in here except for the invokation of the external payment gateway API. The external API invokation has been made simple with the help of a Rest Client extension. The extension can be directly added in the pom.xml as can be seen here. With that in place, an interface for the rest client just needs to be registered with the relevant HTTP path and method details. The actual endpoint url of the payment gateway has been externalized and added to the application configuratoin properties file. With that let me continue the exection of the process instance by completing the make payment step with the credit card details and we will see that the payment gateway API wil be invoked and the barista would be notified of the order. 
 
