@@ -115,7 +115,7 @@ _**Note**: Note down the process instance id that's comes back as a part of the 
 
 After starting the process instances, the status/progress of the process instance could be tracked from the process management console that is available at `http://localhost:8380/`. 
 
-![Kogito Management Console](https://drive.google.com/open?id=1lxKUi4fF6BXj3CEDw-GgN0yr8Ib8Ap9E)
+![Kogito Management Console](config/1.png?raw=true "Title")
 
 In the process management console, select the `Drink Order Process` instance and you can see that the process instance would be waiting at the `place-order` step. Since the persistence has been enabled, even if the `coffee-shop` kogito application goes down, the process instance would remain intact in its current state. You may try to terminate the `coffee-shop` application (_by pressing ctrl+c in the terminal in which it was started_) and you would see that process instance would still remaining in its current state in the Kogito management console. (_if you terminate the application, remember to start it back with the command `cd apps/coffee-shop && mvn compile quarkus:dev`)
 
