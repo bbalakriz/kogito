@@ -157,7 +157,8 @@ Once the payment details have been specified in the make payment step, and since
 
 In the implementation of the PaymentService.java, there's not much of business logic except for the invocation of the external payment gateway API. The external API invocation has been made simple with the help of a Rest Client extension (_`quarkus-rest-client`_) and the extension has been added to the pom.xml of the application. 
 
-`@ApplicationScoped
+`
+@ApplicationScoped
 public class PaymentsService {
 
     @Inject
@@ -176,7 +177,8 @@ public class PaymentsService {
 
 With that in place, an interface for the rest client (PaymentsGateway.java) has been  registered with the relevant HTTP path and method details as shown below. 
 
-`@Path("/")
+`
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @RegisterRestClient
 public interface PaymentsGateway {
@@ -194,26 +196,25 @@ From the Kogito management console, it can seen that the barista process have go
 
 Then, in the application config file, the destination topic to which this message has to be published has been specified along with the connection details to an event stream processing engine like Kafka, and the Kogito event publisher would take care of publishing the event to the specified destination. 
 
-`mp.messaging.outgoing.barista-process.bootstrap.servers=localhost:9092
-mp.messaging.outgoing.barista-process.connector=smallrye-kafka
-mp.messaging.outgoing.barista-process.topic=barista-process
-mp.messaging.outgoing.barista-process.value.serializer=org.apache.kafka.common.serialization.StringSerializer
-`
+    mp.messaging.outgoing.barista-process.bootstrap.servers=localhost:9092
+    mp.messaging.outgoing.barista-process.connector=smallrye-kafka
+    mp.messaging.outgoing.barista-process.topic=barista-process
+    mp.messaging.outgoing.barista-process.value.serializer=org.apache.kafka.common.serialization.StringSerializer
 
 All of this has been done without any coding but just with few configurations and by enabling the kogito reactive messaging add-ons in the pom.xml 
 
-`    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-reactive-messaging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-events-reactive-messaging-addon</artifactId>
-    </dependency>`
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-smallrye-reactive-messaging</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.kogito</groupId>
+          <artifactId>kogito-events-reactive-messaging-addon</artifactId>
+        </dependency>
 
 On the receiving side, the barista process has been configured to listen to the same topic (_Start Message Event with the message name as barista-process_) in Kafka and the Kogito event receiver would then receive the event and start the barista process. And this is how we have got the new instance of the barista process created automatically when the drink order process published an event.
 
@@ -221,115 +222,115 @@ Besides that, the Kogito applications can be configured to publish process and u
 
 For instance, the inbuilt kogito-processinstances-events and kogito-usertaskinstances-events publishing has been enabled in this application using these configurations. 
 
-`mp.messaging.outgoing.kogito-usertaskinstances-events.bootstrap.servers=localhost:9092
-mp.messaging.outgoing.kogito-usertaskinstances-events.connector=smallrye-kafka
-mp.messaging.outgoing.kogito-usertaskinstances-events.topic=kogito-usertaskinstances-events
-mp.messaging.outgoing.kogito-usertaskinstances-events.value.serializer=org.apache.kafka.common.serialization.StringSerializer
-
-mp.messaging.outgoing.kogito-processinstances-events.bootstrap.servers=localhost:9092
-mp.messaging.outgoing.kogito-processinstances-events.connector=smallrye-kafka
-mp.messaging.outgoing.kogito-processinstances-events.topic=kogito-processinstances-events
-mp.messaging.outgoing.kogito-processinstances-events.value.serializer=org.apache.kafka.common.serialization.StringSerializer
-`
+    mp.messaging.outgoing.kogito-usertaskinstances-events.bootstrap.servers=localhost:9092
+    mp.messaging.outgoing.kogito-usertaskinstances-events.connector=smallrye-kafka
+    mp.messaging.outgoing.kogito-usertaskinstances-events.topic=kogito-usertaskinstances-events
+    mp.messaging.outgoing.kogito-usertaskinstances-events.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+    
+    mp.messaging.outgoing.kogito-processinstances-events.bootstrap.servers=localhost:9092
+    mp.messaging.outgoing.kogito-processinstances-events.connector=smallrye-kafka
+    mp.messaging.outgoing.kogito-processinstances-events.topic=kogito-processinstances-events
+    mp.messaging.outgoing.kogito-processinstances-events.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+    
 The set of events that has been published to these topics (_kogito-processinstances-events and kogito-usertaskinstances-events_) could be viewed with the help of any Kafka client it would have the event details published as per the cloudevents specification. A sample message that's been published to the topic kogito-processinstances-events has been shown below. 
 
-`{
-  "specversion": "0.3",
-  "id": "e7a9669b-5b31-428a-81a2-1055ff07312d",
-  "source": "/drink_order_process",
-  "type": "ProcessInstanceEvent",
-  "time": "2020-03-30T14:20:53.624+08:00",
-  "data": {
-    "id": "1a9022dd-06a3-4263-b360-d0671b44a82e",
-    "parentInstanceId": "",
-    "rootInstanceId": "",
-    "processId": "drink_order_process",
-    "rootProcessId": "",
-    "processName": "Drink Order Process",
-    "startDate": "2020-03-30T14:11:41.519+08:00",
-    "endDate": "2020-03-30T14:20:53.615+08:00",
-    "state": 2,
-    "nodeInstances": [
-      {
-        "id": "c56e9d2c-a4be-48d9-afd0-b74d2330014c",
-        "nodeId": "2",
-        "nodeDefinitionId": "_F5372E8C-7723-493E-A523-B4B9FB4AA2AF",
-        "nodeName": "Inform Barista",
-        "nodeType": "EndNode",
-        "triggerTime": "2020-03-30T14:20:53.605+08:00",
-        "leaveTime": "2020-03-30T14:20:53.613+08:00"
-      },
-      {
-        "id": "6506fd23-fb45-4e03-bd4b-f4b503f10d33",
-        "nodeId": "1",
-        "nodeDefinitionId": "_B9944B1B-FB77-4D0D-8EBF-97DE201FC267",
-        "nodeName": "Join",
-        "nodeType": "Join",
-        "triggerTime": "2020-03-30T14:20:53.604+08:00",
-        "leaveTime": "2020-03-30T14:20:53.605+08:00"
-      },
-      {
-        "id": "a0dd09e0-fb64-4be7-9c57-82ea4d498349",
-        "nodeId": "4",
-        "nodeDefinitionId": "_8644C4EC-BCCA-4718-B8A1-6D6C66413074",
-        "nodeName": "Split",
-        "nodeType": "Split",
-        "triggerTime": "2020-03-30T14:20:53.604+08:00",
-        "leaveTime": "2020-03-30T14:20:53.604+08:00"
-      },
-      {
-        "id": "5a325f87-bc85-423f-8b18-ed0d600fc4c8",
-        "nodeId": "5",
-        "nodeDefinitionId": "_A710B96A-6EE1-43BB-A2EE-ACEE59F7479E",
-        "nodeName": "Process payment",
-        "nodeType": "WorkItemNode",
-        "triggerTime": "2020-03-30T14:20:51.402+08:00",
-        "leaveTime": "2020-03-30T14:20:53.604+08:00"
-      },
-      {
-        "id": "b1edd96d-ca01-4f13-9aa1-96cfc2cc1780",
-        "nodeId": "6",
-        "nodeDefinitionId": "_DE7D069C-0E57-4CDF-872A-4D1266D7A6C9",
-        "nodeName": "Split",
-        "nodeType": "Split",
-        "triggerTime": "2020-03-30T14:20:51.401+08:00",
-        "leaveTime": "2020-03-30T14:20:51.402+08:00"
-      },
-      {
-        "id": "169f848c-7960-4c64-abfd-d926aa300b0a",
-        "nodeId": "7",
-        "nodeDefinitionId": "_EF90EB52-7E8D-434C-BA36-AE5A80668DC1",
-        "nodeName": "Make Payment",
-        "nodeType": "HumanTaskNode",
-        "triggerTime": "2020-03-30T14:14:20.785+08:00",
-        "leaveTime": "2020-03-30T14:20:51.401+08:00"
-      }
-    ],
-    "variables": {
-      "process_state": true,
-      "order": {
-        "drinkType": "MOCHA",
-        "cupSize": "SMALL",
-        "cardPayment": {
-          "nameOnCard": "John Doe",
-          "cardNumber": "6432648726424467",
-          "expDate": "11-2024"
+    {
+      "specversion": "0.3",
+      "id": "e7a9669b-5b31-428a-81a2-1055ff07312d",
+      "source": "/drink_order_process",
+      "type": "ProcessInstanceEvent",
+      "time": "2020-03-30T14:20:53.624+08:00",
+      "data": {
+        "id": "1a9022dd-06a3-4263-b360-d0671b44a82e",
+        "parentInstanceId": "",
+        "rootInstanceId": "",
+        "processId": "drink_order_process",
+        "rootProcessId": "",
+        "processName": "Drink Order Process",
+        "startDate": "2020-03-30T14:11:41.519+08:00",
+        "endDate": "2020-03-30T14:20:53.615+08:00",
+        "state": 2,
+        "nodeInstances": [
+          {
+            "id": "c56e9d2c-a4be-48d9-afd0-b74d2330014c",
+            "nodeId": "2",
+            "nodeDefinitionId": "_F5372E8C-7723-493E-A523-B4B9FB4AA2AF",
+            "nodeName": "Inform Barista",
+            "nodeType": "EndNode",
+            "triggerTime": "2020-03-30T14:20:53.605+08:00",
+            "leaveTime": "2020-03-30T14:20:53.613+08:00"
+          },
+          {
+            "id": "6506fd23-fb45-4e03-bd4b-f4b503f10d33",
+            "nodeId": "1",
+            "nodeDefinitionId": "_B9944B1B-FB77-4D0D-8EBF-97DE201FC267",
+            "nodeName": "Join",
+            "nodeType": "Join",
+            "triggerTime": "2020-03-30T14:20:53.604+08:00",
+            "leaveTime": "2020-03-30T14:20:53.605+08:00"
+          },
+          {
+            "id": "a0dd09e0-fb64-4be7-9c57-82ea4d498349",
+            "nodeId": "4",
+            "nodeDefinitionId": "_8644C4EC-BCCA-4718-B8A1-6D6C66413074",
+            "nodeName": "Split",
+            "nodeType": "Split",
+            "triggerTime": "2020-03-30T14:20:53.604+08:00",
+            "leaveTime": "2020-03-30T14:20:53.604+08:00"
+          },
+          {
+            "id": "5a325f87-bc85-423f-8b18-ed0d600fc4c8",
+            "nodeId": "5",
+            "nodeDefinitionId": "_A710B96A-6EE1-43BB-A2EE-ACEE59F7479E",
+            "nodeName": "Process payment",
+            "nodeType": "WorkItemNode",
+            "triggerTime": "2020-03-30T14:20:51.402+08:00",
+            "leaveTime": "2020-03-30T14:20:53.604+08:00"
+          },
+          {
+            "id": "b1edd96d-ca01-4f13-9aa1-96cfc2cc1780",
+            "nodeId": "6",
+            "nodeDefinitionId": "_DE7D069C-0E57-4CDF-872A-4D1266D7A6C9",
+            "nodeName": "Split",
+            "nodeType": "Split",
+            "triggerTime": "2020-03-30T14:20:51.401+08:00",
+            "leaveTime": "2020-03-30T14:20:51.402+08:00"
+          },
+          {
+            "id": "169f848c-7960-4c64-abfd-d926aa300b0a",
+            "nodeId": "7",
+            "nodeDefinitionId": "_EF90EB52-7E8D-434C-BA36-AE5A80668DC1",
+            "nodeName": "Make Payment",
+            "nodeType": "HumanTaskNode",
+            "triggerTime": "2020-03-30T14:14:20.785+08:00",
+            "leaveTime": "2020-03-30T14:20:51.401+08:00"
+          }
+        ],
+        "variables": {
+          "process_state": true,
+          "order": {
+            "drinkType": "MOCHA",
+            "cupSize": "SMALL",
+            "cardPayment": {
+              "nameOnCard": "John Doe",
+              "cardNumber": "6432648726424467",
+              "expDate": "11-2024"
+            },
+            "orderPrice": 15
+          }
         },
-        "orderPrice": 15
-      }
-    },
-    "error": null,
-    "roles": null
-  },
-  "kogitoProcessinstanceId": "1a9022dd-06a3-4263-b360-d0671b44a82e",
-  "kogitoParentProcessinstanceId": "",
-  "kogitoRootProcessinstanceId": "",
-  "kogitoProcessId": "drink_order_process",
-  "kogitoRootProcessId": "",
-  "kogitoProcessinstanceState": "2",
-  "kogitoReferenceId": null,
-  "kogitoAddons": "infinispan-persistence"
-}`
+        "error": null,
+        "roles": null
+      },
+      "kogitoProcessinstanceId": "1a9022dd-06a3-4263-b360-d0671b44a82e",
+      "kogitoParentProcessinstanceId": "",
+      "kogitoRootProcessinstanceId": "",
+      "kogitoProcessId": "drink_order_process",
+      "kogitoRootProcessId": "",
+      "kogitoProcessinstanceState": "2",
+      "kogitoReferenceId": null,
+      "kogitoAddons": "infinispan-persistence"
+    }
 
 ## Securing the Kogito REST API endpoints
 
