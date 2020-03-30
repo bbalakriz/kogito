@@ -45,4 +45,4 @@ The drink-order-process (located at coffe-shop/src/main/resource/org/bala/drink/
 
 ## Barista Project - Quick Overview
 
-In here, the barista process has been designed to run as a seperate Kogito application and would be reacting to the coffee drink order taking process. Take a look at the barista process, it is a very simple one that shows that the barista would prepare the coffee and the customer would collect it once it is ready..
+The barista process has been designed to run as a seperate Kogito application and would be reacting to the coffee drink order taking process. Again, it is a very simple one that shows that the barista would prepare the coffee and the customer would collect it once it is ready..
