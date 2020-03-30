@@ -336,29 +336,37 @@ The set of events that has been published to these topics (_kogito-processinstan
 
 The interactions with the REST APIs of the Kogito application and the process instances has been done in an unsecured fashion so far. These APIs could be quickly secured with the help of an Open ID Connect (OIDC) server, for instance using Keycloak. Shown below are the OIDC server connection details that are to be added to the application.properties to secure the root context path of the Kogito application.
 
-`quarkus.oidc.auth-server-url=http://localhost:8280/auth/realms/kogito
- quarkus.oidc.client-id=kogito-app
- quarkus.oidc.credentials.secret=secret
-
- quarkus.http.auth.permission.authenticated.paths=/*
- quarkus.http.auth.permission.authenticated.policy=authenticated`
+    quarkus.oidc.auth-server-url=http://localhost:8280/auth/realms/kogito
+     quarkus.oidc.client-id=kogito-app
+     quarkus.oidc.credentials.secret=secret
+    
+     quarkus.http.auth.permission.authenticated.paths=/*
+     quarkus.http.auth.permission.authenticated.policy=authenticated
 
 Once these configurations are added to the cofiguration file, a hot reload of the Kogito application could be triggered by accessing `http://localhost:8080/swagger-ui` in the browser and you'll find that the swagger-ui would be inaccessible. 
 
 The client in the OIDC server has been configured with the client credentials flow, and so the bearer token can be first obtained and the API can be invoked. 
 
 The access token could be obtained by using the client credentials and stored it in an env variable using the following command.
-`
-export access_token=$(\
-    curl -X POST http://localhost:8280/auth/realms/kogito/protocol/openid-connect/token \
-    --user kogito-app:secret \
-    -H 'content-type: application/x-www-form-urlencoded' \
-    -d 'username=john&password=john&grant_type=password' | jq --raw-output '.access_token' \
- )`
- 
-With that the drink-order-process could be started from a terminal using the command `curl -i -H "Authorization: Bearer "$access_token -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"`. You'll notice that a process instance will get created.
 
-Trying to invoke the API without an access token `curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"` will result in an `401 Unauthorized` error. 
+    export access_token=$(\
+        curl -X POST http://localhost:8280/auth/realms/kogito/protocol/openid-connect/token \
+        --user kogito-app:secret \
+        -H 'content-type: application/x-www-form-urlencoded' \
+        -d 'username=john&password=john&grant_type=password' | jq --raw-output '.access_token' \
+     )
+ 
+With that the drink-order-process could be started from a terminal using the command 
+
+    curl -i -H "Authorization: Bearer "$access_token -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"
+
+You'll notice that a process instance will get created.
+
+Trying to invoke the API without an access token will result in an `401 Unauthorized` error.
+
+`
+curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"` 
+ 
 
 
 
