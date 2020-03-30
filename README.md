@@ -120,8 +120,7 @@ The Swagger UI for the coffee-shop application can be accessed at `http:localhos
 From the Swagger UI, the drink order process can be started by invoking the end point `POST
 /drink_order_process`. Alternatively, the process instance could be started from the terminal using the command
 
-`# start process instance
-curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"`
+    curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"
 
 _**Note**: Note down the process instance id that's comes back as a part of the response to this API call. The following sections will refer to this id as {puid}_
 
@@ -133,23 +132,23 @@ In the process management console, select the `Drink Order Process` instance and
 
 Complete the place order by using the step specific REST APIs. First, get the task instance id for the process instance {puid} and by invoking the API
 
-`curl -i -X GET "http://localhost:8080/drink_order_process/{puid}/tasks" -H "accept: application/json" `
-
+    curl -i -X GET "http://localhost:8080/drink_order_process/{puid}/tasks" -H "accept: application/json"
+    
 _**Note**: Note down the task instance id that's comes back as a part of the response to this API call. The following sections will refer to this id as {t1uid}_
 
 Then, complete the `place-order` task by invoking the step specific API along with the order details. 
 
-`curl -X POST "http://localhost:8080/drink_order_process/{puid}/place_order/{t1uid}" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"order_out\":{\"cupSize\":\"SMALL\",\"drinkType\":\"MOCHA\"}}"`
+    curl -X POST "http://localhost:8080/drink_order_process/{puid}/place_order/{t1uid}" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"order_out\":{\"cupSize\":\"SMALL\",\"drinkType\":\"MOCHA\"}}"    
 
 Now that the `place-order` step has been completed, re-invoke the API to get the task id  for the task that's next in the line of process execution. 
 
-`curl -i -X GET "http://localhost:8080/drink_order_process/{puid}/tasks" -H "accept: application/json"`
+    curl -i -X GET "http://localhost:8080/drink_order_process/{puid}/tasks" -H "accept: application/json"    
 
 _**Note**: Note down the task instance id that's comes back as a part of the response to this API call. The following sections will refer to this id as {t2uid}_
 
 Complete the `make-payment` by using the {puid} and {t2uid} as shown below.
 
-`curl -X POST "http://localhost:8080/drink_order_process/{puid}/make_payment/{t2uid}" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"order_out\":{\"cardPayment\":{\"cardNumber\":\"6432648726424467\",\"expDate\":\"11-2024\",\"nameOnCard\":\"John Dow\"},\"cupSize\":\"SMALL\",\"drinkType\":\"MOCHA\",\"orderPrice\":15}}"`
+    curl -X POST "http://localhost:8080/drink_order_process/{puid}/make_payment/{t2uid}" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"order_out\":{\"cardPayment\":{\"cardNumber\":\"6432648726424467\",\"expDate\":\"11-2024\",\"nameOnCard\":\"John Dow\"},\"cupSize\":\"SMALL\",\"drinkType\":\"MOCHA\",\"orderPrice\":15}}"    
 
 Once the payment details have been specified in the make payment step, and since the payment method has been specified as "credit card", the payment processing automated step would get triggered which in turn has been configured to invoke a payment gateway API. Looking at the process payment step and it can seen that the service that's linked to this step is Payments Service and payment processing service operation in that service will be invoked. 
 
@@ -157,36 +156,35 @@ Once the payment details have been specified in the make payment step, and since
 
 In the implementation of the PaymentService.java, there's not much of business logic except for the invocation of the external payment gateway API. The external API invocation has been made simple with the help of a Rest Client extension (_`quarkus-rest-client`_) and the extension has been added to the pom.xml of the application. 
 
-`
-@ApplicationScoped
-public class PaymentsService {
 
-    @Inject
-    @RestClient
-    PaymentsGateway paymentsGateway;
-
-    public boolean process(DrinkOrder order) {
-        // invoke an external payments gateway service
-        Response response = paymentsGateway.makePayment(order.getCardPayment());
-        System.out.println("*******************************************************");
-        System.out.println("Payment processed successfully by the payment gateway");
-        System.out.println("*******************************************************");
-        return response.getStatus() == Response.Status.OK.getStatusCode();
-    }
-}`
+        @ApplicationScoped
+    public class PaymentsService {
+    
+        @Inject
+        @RestClient
+        PaymentsGateway paymentsGateway;
+    
+        public boolean process(DrinkOrder order) {
+            // invoke an external payments gateway service
+            Response response = paymentsGateway.makePayment(order.getCardPayment());
+            System.out.println("*******************************************************");
+            System.out.println("Payment processed successfully by the payment gateway");
+            System.out.println("*******************************************************");
+            return response.getStatus() == Response.Status.OK.getStatusCode();
+        }
+    }    
 
 With that in place, an interface for the rest client (PaymentsGateway.java) has been  registered with the relevant HTTP path and method details as shown below. 
 
-`
-@Path("/")
-@Produces(MediaType.APPLICATION_JSON)
-@RegisterRestClient
-public interface PaymentsGateway {
-
-    @POST
-    @Path("/post")
-    Response makePayment(CardPayment payment);
-}`
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RegisterRestClient
+    public interface PaymentsGateway {
+    
+        @POST
+        @Path("/post")
+        Response makePayment(CardPayment payment);
+    }
 
 The actual endpoint url of the payment gateway has been externalized and added to the application configuration properties file. With that, the payment gateway API will be invoked and the barista would be notified of the order. 
 
@@ -364,8 +362,7 @@ You'll notice that a process instance will get created.
 
 Trying to invoke the API without an access token will result in an `401 Unauthorized` error.
 
-`
-curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"` 
+    curl -i -H "Authorization: Bearer "$access_token -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"
  
 
 
