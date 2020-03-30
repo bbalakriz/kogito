@@ -5,6 +5,7 @@ This repository showcases some of the key capabilities of Kogito specifically on
 1. Provides runtime persistence for workflows to preserve the state of the process instances across restarts
 2. Supports first class citizen support for events and enables integration with third party systems with both events and external REST API calls
 3. Enables the tracking of the process instances progress from the Kogito process management console
+4. Integrates with an OpenId Connect Server to provide security to the the Kogito application endpoints 
 
 ## Pre-requisites
 
