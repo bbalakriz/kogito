@@ -362,7 +362,7 @@ You'll notice that a process instance will get created.
 
 Trying to invoke the API without an access token will result in an `401 Unauthorized` error.
 
-    curl -i -H "Authorization: Bearer "$access_token -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"
+    curl -i -X POST "http://localhost:8080/drink_order_process" -H "accept: application/json" -H "Content-Type: application/json" -d "{}"
  
 
 
